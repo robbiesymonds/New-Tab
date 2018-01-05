@@ -1,0 +1,23 @@
+{
+    "name": "Keystone Tab Page",
+    "description": "Provides quick links to four popular websites. Includes integration with Keystone, homework and favourites are accessible from a new tab.",
+    "version": "0.3",
+    "manifest_version": 2,
+    "icons": { 
+        "16": "assets/icons/logo.png",
+        "48": "assets/icons/logo.png",
+        "128": "assets/icons/logo.png" 
+    },
+   "permissions" : [
+    "https://keystone.stpeters.sa.edu.au/*",
+    "http://robbiesymonds.me/*",
+    "tabs",
+    "cookies",
+    "management",
+    "storage",
+    "notifications"
+  ],
+    "chrome_url_overrides" : {
+        "newtab": "index.html"
+    }
+ }

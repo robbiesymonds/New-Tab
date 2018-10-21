@@ -1,53 +1,70 @@
 var tasks;
+var user_id = '';
+var quickLoad_state = false;
+document.onkeydown = quickLoad;
 
-// $status = "";
-// chrome.storage.local.get('login_status', function(result){
-//    	$status = result.login_status;
-//    	console.log($status);
-   	// if ($status == null) {
-   	// 	$('.login-wrapper').fadeIn(200);
-   	// }
-// });
+function getUserID() {
+	var new_username = prompt('Please enter your keystone username');
+	$.getJSON('https://keystone-apps.stpeters.sa.edu.au/api/people/'+new_username, function(data) {
+		user_id = data.id;
+		chrome.storage.local.set({'ks_username': user_id});
+	});
+}
 
-$('.login-input').on('input', function() {
-	$('.login-text').removeClass('shown-text');
-	if ($(this).val().length == 5) {
-		if ($('.login-input').val() == '57758') {
-			$(this).addClass('valid');
-			$(this).css('margin-top', '-3px');
-			$(this).css('border', '3px solid #4CAF50');
-		} else if ($('.login-input').val() == '59845') {
-			$(this).addClass('valid');
-			$(this).css('margin-top', '-3px');
-			$(this).css('border', '3px solid #4CAF50');
-		} else {
-			$(this).removeClass('valid');
-			$(this).css('margin-top', '-3px');
-			$(this).css('border', '3px solid #F44336');
-		}
-	} else {
-		if ($(this).val() == '82729394_login') {
-			$(this).addClass('valid');
-			$(this).css('margin-top', '-3px');
-			$(this).css('border', '3px solid #4CAF50');
-		} else {
-			$(this).removeClass('valid');
-			$(this).css('margin-top', '0px');
-			$(this).css('border', 'none');
-		}
+chrome.storage.local.get('ks_username', function(result) {
+   if (!result.ks_username) {
+   		getUserID();
+   } else {
+   		user_id = result.ks_username;
+   		// Load Homework
+		$.getJSON('https://keystone-apps.stpeters.sa.edu.au/api/tasks/users/'+user_id, function(data) {
+			tasks = data['tasks'];
+			console.log(tasks);
+			loadDate(moment());
+		});
 	}
 });
 
-$(".login-input").on('keyup', function (e) {
-    if (e.keyCode == 13) {
-        if ($(this).hasClass('valid')) {
-        	$('.login-fields').addClass('disappear-fields');
-        	$('.login-wrapper').fadeOut(200);
-        	chrome.storage.local.set({'login_status': 'true'});
-        } else {
-        	$('.login-text').addClass('shown-text');
-        }
-    }
+chrome.storage.local.get('quickLoad_state', function(result) {
+   	quickLoad_state = result.quickLoad_state;
+   	$('.quickload-text').val(quickLoad_state);
+});
+
+function quickLoad(e) {
+	var e = window.event;
+	if (e.keyCode == 9) {
+		chrome.storage.local.get('quickLoad_state', function(result) {
+		   	quickLoad_state = result.quickLoad_state;
+		   	var quickLoad_urls = quickLoad_state.replace(", ", ",");
+		   	var url_array = quickLoad_urls.split(',');
+		   	var url_first = true;
+		   	$.each(url_array, function(key) {
+		   		if (url_first == true) {
+		   			window.location.href = url_array[key];
+		   			url_first = false;
+		   		} else {
+		   			chrome.tabs.create({url: url_array[key]});
+		   		}
+		   	});
+		});
+	}
+
+	if (e.keyCode == 192) {
+		$('.fullscreen-fade').fadeToggle(200);
+		setTimeout(function() {
+			$('.quickload-box').toggleClass('quickload-hide');
+		}, 200);
+	}
+}
+
+$('.done-button').click(function() {
+	if ($('.quickload-text').val().length > 1) {
+		chrome.storage.local.set({'quickLoad_state': $('.quickload-text').val()});
+		$('.fullscreen-fade').fadeToggle(200);
+		setTimeout(function() {
+			$('.quickload-box').toggleClass('quickload-hide');
+		}, 200);
+	}
 });
 
 $(window).on('beforeunload', function() {
@@ -64,10 +81,9 @@ $('.favourites').on('mousewheel', function(e) {
     var delta = e.originalEvent.wheelDelta;
 
     if (delta > 0) {
-        // Scrolled Up
         $('.favourites').fadeOut(200);
-	$('.favourites-box').addClass('box-hidden');
-	$('.favourites-link').addClass('link-hidden');
+		$('.favourites-box').addClass('box-hidden');
+		$('.favourites-link').addClass('link-hidden');
     }
 });
 
@@ -81,13 +97,11 @@ $('.fav-button').click(function(e) {
 })
 
 var currentMoment = moment();
-
 function loadRelativeDate(change){
 	loadDate(currentMoment.hours(change*24).minutes(0).seconds(0).milliseconds(0));
 }
 
 function loadDate(theMoment){
-
 	currentMoment = theMoment;
 	var dayOfMonth = currentMoment.date();
 	var today = moment().date();
@@ -104,15 +118,13 @@ function loadDate(theMoment){
 
 	$('.date-full').html(currentMoment.format("Do of MMMM, YYYY"));
 	$('.homework-body').html('');
-
-		var date = currentMoment.format("YYYY-MM-DD HH:mm:ss");
-		for(var i = 0; i < tasks.length; i++){
-			var task = tasks[i];
-			if(dateWithin(task.start, task.end, date)){
-				addTask(task);
-			}
+	var date = currentMoment.format("YYYY-MM-DD HH:mm:ss");
+	for(var i = 0; i < tasks.length; i++){
+		var task = tasks[i];
+		if(dateWithin(task.dateStart, task.dateDue, date)){
+			addTask(task);
 		}
-
+	}
 }
 
 function dateWithin(b,e,c) {
@@ -124,7 +136,7 @@ function dateWithin(b,e,c) {
 
 function addTask(task) {
 	var timeago = "today";
-	var taskMoment = moment(task.end);
+	var taskMoment = moment(task.dateDue);
 	if(currentMoment.date() != taskMoment.date()){
 		timeago = taskMoment.from(currentMoment);
 		if (timeago == 'in 2 days') {
@@ -136,9 +148,9 @@ function addTask(task) {
 
 	var schoolClass = "";
 	if(task.schoolClass)
-		schoolClass = task.schoolClass.replace(task.schoolClass.match(/\((.*?)\)/g),"");
+		schoolClass = task.schoolClass;
 
-	if (task.taskStatusId == "2") {
+	if (task.status == 2) {
 		checkedClass = 'checked';
 		checkedHTML = '<svg style="width:32px;height:32px" viewBox="0 0 24 24"><path fill="grey" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>'
 	} else {
@@ -157,6 +169,7 @@ function addTask(task) {
 	$item_3 = '</div>';
 
 	$item = $item_1 + $item_2 + $item_3;
+	console.log($item);
 	$('.homework-body').append($item);
 }
 
@@ -170,14 +183,6 @@ $(document).ready(function() {
 			$item = '<a style="color: black;" href="'+favourite.attr.url+'"><div class="favourite"><h1 class="favourites-title">'+favourite.data+' <span class="pin">'+id+'</span></h1></div></a>';
 			$('.favourites-box').append($item);
 		}
-	});
-
-
-	// Load Homework
-
-	$.getJSON('https://keystone.stpeters.sa.edu.au/_layouts/StPeters.Keystone/MyTasks/MyTasksHttpHandler.ashx?&action=list', function(data) {
-		tasks = data['events'];
-		loadDate(moment());
 	});
 
 	setTimeout(function() {
@@ -218,15 +223,13 @@ function hideHomeworkTile() {
 }
 
 function switchCompleteStatus(id, status){
-	$.get('https://keystone.stpeters.sa.edu.au/_layouts/StPeters.Keystone/MyTasks/MyTasksHttpHandler.ashx?' + (new Date().getTime()) + '&action=SETSTATUS&id=' + id + '&s=' + status, function (result) {
-		if (result != 'OK')
-			alert(result);
+	$.post('https://keystone-apps.stpeters.sa.edu.au/api/tasks/'+id+'/status/'+status, function (result) {
+		// Test
 	});	
 }
 
 $('.up-arrow').click(function() {
-	// hideHomeworkTile();
-	window.location.href = "https://keystone.stpeters.sa.edu.au/Pages/MyTasks.aspx";
+	window.location.href = "https://keystone-apps.stpeters.sa.edu.au/tasks";
 });
 
 $('body').on('click', '.homework-checkbox', function() {

@@ -1,0 +1,23 @@
+{
+    "name": "UA New Tab",
+    "description": "Provides access to a set of customisable websites as well as functionality to automatically open multiple pages at once. Includes integration with University of Adelaide platforms for timetable, assignments, and more.",
+    "version": "1.0",
+    "manifest_version": 2,
+    "icons": { 
+        "16": "assets/icons/logo.png",
+        "48": "assets/icons/logo.png",
+        "128": "assets/icons/logo.png" 
+    },
+   "permissions" : [
+    "https://*.adelaide.edu.au/*",
+    "http://robbiesymonds.me/*",
+    "tabs",
+    "cookies",
+    "management",
+    "storage",
+    "notifications"
+  ],
+    "chrome_url_overrides" : {
+        "newtab": "index.html"
+    }
+ }

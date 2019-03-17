@@ -1,6 +1,6 @@
 {
-    "name": "UA New Tab",
-    "description": "Provides access to a set of customisable websites as well as functionality to automatically open multiple pages at once. Includes integration with University of Adelaide platforms for timetable, assignments, and more.",
+    "name": "Canvas Tab Page",
+    "description": "Provides access to four common websites and includes integration with the Canvas platform for assignments, courses, and more.",
     "version": "1.0",
     "manifest_version": 2,
     "icons": { 
@@ -9,7 +9,10 @@
         "128": "assets/icons/logo.png" 
     },
    "permissions" : [
-    "https://*.adelaide.edu.au/*",
+    "https://myuni.adelaide.edu.au/*",
+    "http://myuni.adelaide.edu.au/*",
+    "https://canvas.instructure.com/*",
+    "http://canvas.instructure.com/*",
     "http://robbiesymonds.me/*",
     "tabs",
     "cookies",

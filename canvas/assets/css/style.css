@@ -12,7 +12,7 @@ html, body {
 	overflow: hidden;
 }
 
-.fullscreen-fade {
+.fullscreen-fade, .token-fade {
 	width: 100%;
 	display: none;
 	height: 100%;
@@ -23,13 +23,13 @@ html, body {
 	left: 0;
 }
 
-.quickload-hide {
+.quickload-hide, .token-hide {
 	top: 45px !important;
 	opacity: 0 !important;
 	transition: all 0.2s
 }
 
-.quickload-box {
+.quickload-box, .token-box {
 	width: 90%;
 	max-width: 500px;
 	background-color: white;
@@ -46,7 +46,7 @@ html, body {
 	transition: all 0.2s
 }
 
-.quickload-text {
+.quickload-text, .token-text {
 	width: calc(100% - 80px);
 	resize: none;
 	outline: none;
@@ -288,9 +288,11 @@ html, body {
 	text-align: center;
 	width: 50%;
 	margin: 0 auto;
+	user-select: none;
 }
 
 .day {
+	user-select: none;
 	font-weight: 500;
 	color: white;
 	margin: 0;
@@ -399,6 +401,7 @@ html, body {
 
 .homework-details {
 	font-weight: 500;
+	text-transform: capitalize;
 	font-size: 14px;
 	color: #444;
 	margin-top: -10px;
@@ -424,6 +427,16 @@ html, body {
 	text-overflow: ellipsis;
 }
 
+a {
+	text-decoration: none;
+	color: black;
+}
+
+.homework-title:hover {
+	text-decoration: underline;
+	cursor: pointer;
+}
+
 .homework-panel {
 	border-top-left-radius: 2px;
 	border-top-right-radius: 2px;
@@ -436,6 +449,12 @@ html, body {
 	height: 90%;
 	left: calc(50% - 300px);
 	transition: all 0.3s;
+}
+
+.homework-body {
+	height: calc(100% - 60px);
+	overflow: auto;
+	width: 100%;
 }
 
 a {
@@ -470,9 +489,9 @@ a {
 	background-position: center; 
 }
 
-.keystone {
+.canvas {
 	position: relative;
-	background-image: url('../images/keystone.png');
+	background-image: url('../images/canvas.png');
 	background-repeat: no-repeat;
 	background-size: 30% auto;
 	background-position: center; 

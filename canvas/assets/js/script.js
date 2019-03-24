@@ -28,8 +28,38 @@ chrome.storage.local.get('quickLoad_state', function(result) {
    	$('.quickload-text').val(quickLoad_state);
 });
 
+chrome.storage.local.get('completeHidden_state', function(result) {
+	 if (!result.completeHidden_state) {
+	 	completeHidden = false;
+	 	chrome.storage.local.set({'completeHidden_state': completeHidden});
+	 } else {
+	 	 completeHidden = result.completeHidden_state;
+	 }
+});
+
 function quickLoad(e) {
 	var e = window.event;
+	if (e.keyCode == 32) {
+		if (completeHidden == false) {
+			$('.homework-item').each(function() {
+				if ($(this).children('.homework-checkbox').hasClass('checked'))
+					$(this).hide();
+				else
+					$(this).show();
+			});
+			completeHidden = true;
+			$('.homework-completeHidden-message').show();
+		} else {
+			$('.homework-item').show();
+			completeHidden = false;
+			$('.homework-completeHidden-message').hide();
+		}
+		chrome.storage.local.set({'completeHidden_state': completeHidden});
+		if ($('.homework-item:visible').length == 0)
+			$('.homework-noHomework-message').show();
+		else 
+			$('.homework-noHomework-message').hide();
+	}
 	if (e.keyCode == 9) {
 		chrome.storage.local.get('quickLoad_state', function(result) {
 			if (result.quickLoad_state) {
@@ -148,6 +178,16 @@ function loadTasks(start, end) {
 		for (var i = 0; i <= data.length-1; i++) {
 			addTask(data[i]);
 		}
+
+		if ($('.homework-item:visible').length == 0)
+			$('.homework-noHomework-message').show();
+		else 
+			$('.homework-noHomework-message').hide();
+
+		if (completeHidden == true)
+			$('.homework-completeHidden-message').show();
+		else 
+			$('.homework-completeHidden-message').hide();
 	});
 }
 
@@ -178,6 +218,10 @@ function addTask(task) {
 	checkedHTML = (status == true) ? '<svg style="width:32px;height:32px" viewBox="0 0 24 24"><path fill="grey" d="M21,7L9,19L3.5,13.5L4.91,12.09L9,16.17L19.59,5.59L21,7Z" /></svg>' : '';
 	$item = '<div id="'+task.plannable_id+'" class="homework-item"><div class="homework-checkbox '+checkedClass+'">'+checkedHTML+'</div><div class="homework-info"><a href="https://myuni.adelaide.edu.au'+task.html_url+'"><h1 class="homework-title">'+title+'</h1></a><h3 class="homework-details">'+task.plannable_type+' <span class="homework-subject">'+course+'</span></h3></div>';
 	$('.homework-body').append($item);
+
+	if (completeHidden == true && status == true)
+		$('.homework-item').last().hide();
+   		
 }
 
 $(document).ready(function() {

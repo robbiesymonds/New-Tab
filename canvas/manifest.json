@@ -1,12 +1,12 @@
 {
     "name": "Canvas Tab Page",
     "description": "Provides access to four common websites and includes integration with the Canvas platform for assignments, courses, and more.",
-    "version": "1.0",
+    "version": "1.2",
     "manifest_version": 2,
     "icons": { 
-        "16": "assets/icons/logo.png",
-        "48": "assets/icons/logo.png",
-        "128": "assets/icons/logo.png" 
+        "16": "assets/icons/logo16.png",
+        "48": "assets/icons/logo48.png",
+        "128": "assets/icons/logo128.png" 
     },
    "permissions" : [
     "https://myuni.adelaide.edu.au/*",

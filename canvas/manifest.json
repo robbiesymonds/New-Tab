@@ -9,10 +9,9 @@
         "128": "assets/icons/logo128.png" 
     },
    "permissions" : [
-    "https://myuni.adelaide.edu.au/*",
-    "http://myuni.adelaide.edu.au/*",
-    "https://canvas.instructure.com/*",
-    "http://canvas.instructure.com/*",
+    "*://myuni.adelaide.edu.au/*",
+    "*://canvas.instructure.com/*",
+    "*://*.chegg.com/*",
     "tabs",
     "cookies",
     "management",
@@ -21,5 +20,10 @@
   ],
     "chrome_url_overrides" : {
         "newtab": "index.html"
-    }
+    },
+    "content_scripts": [{
+    	"matches": ["*://*.chegg.com/*"],
+    	"js": ["assets/js/jquery.js", "assets/js/helpers.js"],
+        "run_at": "document_end"
+ 	}]
  }
